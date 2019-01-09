@@ -1,17 +1,21 @@
 package com.example.lewis.solitairtest.solitairLogic;
 
 public class CardLocation {
-    public int cardId, col, row, stackType;
+    public int cardId, col, row;
+    SolitaireGame.Location location;
+    public boolean faceUp;
 
-    public CardLocation(int cardId, int col, int row, int stackType) {
+    public CardLocation(int cardId, boolean faceUp, int col, int row, SolitaireGame.Location location) {
         this.cardId = cardId;
         this.col = col;
         this.row = row;
-        this.stackType = stackType;
+        this.location = location;
+        this.faceUp = faceUp;
+
     }
 
     @Override
     public String toString(){
-        return "CardInfo[CardId: " + cardId + ", stackType: " + stackType + " Col: " + col + " Row: " + row + " ]";
+        return "CardInfo[CardId: " + cardId + ", stackType: " + location + " Col: " + col + " Row: " + row + " ]";
     }
 }

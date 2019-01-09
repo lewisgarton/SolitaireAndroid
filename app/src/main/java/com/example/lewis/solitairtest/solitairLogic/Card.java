@@ -1,8 +1,6 @@
 package com.example.lewis.solitairtest.solitairLogic;
 
 public class Card {
-    public static final int JACK = 11;
-    public static final int QUEEN = 12;
     public static final int KING = 13;
     public static final int ACE = 1;
 
@@ -34,10 +32,6 @@ public class Card {
     }
 
     public int getCardId() {
-        //Todo clean this up
-        if(!isFaceUp){
-            return SolitaireGame.FACE_DOWN;
-        }
         return cardId;
     }
 

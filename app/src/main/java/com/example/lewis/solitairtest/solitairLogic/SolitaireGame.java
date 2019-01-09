@@ -5,7 +5,8 @@ import android.util.Log;
 import java.util.ArrayList;
 
 public class SolitaireGame {
-    enum Location {
+    public final boolean DEBUG_MODE = true;
+    public enum Location {
         TABLEAU, FOUNDATION, STOCK, WASTEPILE
     }
 
@@ -16,13 +17,6 @@ public class SolitaireGame {
     public ArrayList<Foundation> foundations;
     public ArrayList<Tableau> tableaus;
 
-    public static final int TABLEAU = 1000;
-    public static final int FOUNDATION = 1001;
-    public static final int DECK = 1002;
-    public static final int EMPTY_CARD = 1003;
-    public static final int TOP_DECK = 1004;
-    public static final int FACE_DOWN = 1005;
-
     public boolean firstCardSelected = false;
     public CardLocation firstCard = null;
     public CardLocation secondCard = null;
@@ -30,7 +24,7 @@ public class SolitaireGame {
     public void resetBoard() {
         // Setup the decks
         stock = new Deck(Deck.DeckType.STANDARD_NO_JOKERS);
-        stock.shuffle();
+        //stock.shuffle();
         wastePile = new Deck();
 
         //setup the Foundations
@@ -50,39 +44,47 @@ public class SolitaireGame {
         }
     }
 
-    public void cardClicked(CardLocation cardInfo){
-        if(cardInfo.stackType == DECK) {
+    public void cardClicked(CardLocation cardInfo) {
+        int tabsize = 0;
+
+        //Return if fist card selected is an empty slot
+        if(firstCard == null && cardInfo.row == -1) return;
+
+        // Stock clicked to draw next card
+        if (cardInfo.location == Location.STOCK) {
             drawCardFromDeck();
-            log("DECK CLICKED: ", "first card = " + firstCard);
             firstCard = null;
-        }else if(firstCard == null && isFaceDown(cardInfo) && cardInfo.stackType == TABLEAU){
-            flip(cardInfo);
-        }else if(firstCard == null && removePossible(cardInfo)) {
+            if(DEBUG_MODE) log("CARD CLICK", "Card drawn from deck.");
+
+        // Tableau face down card selected
+        } else if(cardInfo.location == Location.TABLEAU && !cardInfo.faceUp) {
+            // Flip the card if it is at the top of the tableau
+            tabsize = tableaus.get(cardInfo.col).size();
+            if (tabsize >= 0 && tabsize - 1 == cardInfo.row) {
+                flip(cardInfo);
+                firstCard = null;
+                if(DEBUG_MODE) log("CARD CLICK", "Face down card turned over.");
+            }
+
+        // Selecting first card
+        } else if (firstCard == null && removePossible(cardInfo)) {
             firstCard = cardInfo;
-            log("Remove possible: ", "first card = " + firstCard);
-        }else if(firstCard != null && isLegalMove(cardInfo)){
-            Log.i("ACTION: ", "Attempting to move card ");
-            log("Move possible: ", "first card = " + firstCard);
-            log("Moving: ", "first card = " + firstCard + " To " + cardInfo);
+            if(DEBUG_MODE) log("CARD CLICK", "Card with id: " + cardInfo.cardId + " set as first card.");
+
+        // Second card selected and move legal
+        } else if (firstCard != null && isLegalMove(cardInfo)){
+            if(DEBUG_MODE) log("CARD CLICK", "Moving card with id: " + firstCard.cardId + " on to card with id: " + cardInfo.cardId);
             move(cardInfo);
+            if(DEBUG_MODE) log("CARD MOVED", "Move successful");
             firstCard = null;
-            log("Set first card to null: ", "first card = " + firstCard);
-        }else{
+
+        // Unknown action release card if selected
+        } else {
            firstCard = null;
-            log("Move not possible: ", "first card = " + firstCard);
+            if(DEBUG_MODE) log("CLICK INVALID", "First card released");
         }
-
-
     }
 
-    public boolean isFaceDown(CardLocation cardInfo) {
-        boolean flag = false;
-        CardStack stack = tableaus.get(cardInfo.col);
-        if(stack.size()-1 == cardInfo.row && !stack.cardAt(cardInfo.row).isFaceUp){ //is the top card and face down
-            flag = true;
-        }
-        return flag;
-    }
 
     public void flip(CardLocation cardInfo){
         tableaus.get(cardInfo.col).cardAt(cardInfo.row).isFaceUp = true;
@@ -93,80 +95,85 @@ public class SolitaireGame {
     }
 
     public void move(CardLocation cardBInfo) {
-        Card cardA;
-        CardStack stackA = findStack(firstCard.col, firstCard.stackType);
-        CardStack stackB = findStack(cardBInfo.col, cardBInfo.stackType);
-        if(firstCard.stackType == TOP_DECK){
-            cardA = wastePile.popTop();
-            stackB.pushCard(cardA);
-        }else if(firstCard.stackType == TABLEAU){
-            while(stackA.size()-1 >= firstCard.row){
-                cardA = ((Tableau)stackA).popCard(firstCard.row);    // Left this seperate as will need to change this method later to allow for multiple cards to be moved
-                stackB.pushCard(cardA);
-            }
-        }else{  //is foundation
-            cardA = stackA.popCard();
-            stackB.pushCard(cardA);
+        Card cardA = null;
+        CardStack stack;
+
+        // find the stack to push the cards
+        if(cardBInfo.location == Location.TABLEAU){
+            stack = tableaus.get(cardBInfo.col);
+        }else{
+            stack = foundations.get(cardBInfo.col);
         }
 
+        // find the first card
+        if(firstCard.location == Location.WASTEPILE){
+            stack.pushCard(wastePile.popTop());
+        }else if(firstCard.location == Location.TABLEAU){
+            Tableau t = tableaus.get(firstCard.col);
+            // Push all cards on top of first card to new position
+            while(t.size()-1 >= firstCard.row){
+                stack.pushCard(t.popCard(firstCard.row));
+            }
+        }else if(firstCard.location == Location.FOUNDATION){
+            Foundation f = foundations.get(firstCard.col);
+            stack.pushCard(f.popCard());
+        }
     }
 
     public boolean isLegalMove(CardLocation cardBInfo){
-        Card a = null;
-        if(firstCard.stackType == TOP_DECK){
-            a = wastePile.viewTop();
-        }else if (firstCard.stackType == TABLEAU || firstCard.stackType == FOUNDATION){
-            CardStack stackA = findStack(firstCard.col, firstCard.stackType);
-            a = stackA.cardAt(firstCard.row);
+        Card cardA = null;
+        boolean isLegal = false;
+
+        // Find the card on the board
+        if(firstCard.location == Location.WASTEPILE) {
+            cardA = wastePile.viewTop();
+        }else if(firstCard.location == Location.TABLEAU) {
+            cardA = tableaus.get(firstCard.col).cardAt(firstCard.row);
+        }else if (firstCard.location == Location.FOUNDATION) {
+            cardA = foundations.get(firstCard.col).viewTopCard();
+        }else {
+            return isLegal;
         }
 
-        CardStack stackB = findStack(cardBInfo.col, cardBInfo.stackType);
-
-        if(a == null) return false;
-        else return stackB.pushCheck(a);
+        // Find the stack card is being moved to and test
+        if(cardBInfo.location == Location.TABLEAU) {
+            isLegal = tableaus.get(cardBInfo.col).pushCheck(cardA);
+        }else if(cardBInfo.location == Location.FOUNDATION) {
+            isLegal = foundations.get(cardBInfo.col).pushCheck(cardA);
+        }
+        return isLegal;
     }
 
     public boolean removePossible(CardLocation cardInfo){
         boolean possible = false;
-        int stackType = cardInfo.stackType;
-
-        if(stackType == TOP_DECK && wastePile.viewTop() != null) possible = true;
-        else if(stackType == TABLEAU || stackType == FOUNDATION){
-            CardStack stack = findStack(cardInfo.col, cardInfo.stackType);
-            if(stack.isCardRemovable(cardInfo.row)){
+        // Removing card from the top of the wastepile
+        if(cardInfo.location == Location.WASTEPILE && wastePile.viewTop() != null) {
+            possible = true;
+        // If stack is not empty
+        }else if(cardInfo.row >= 0) {
+            // Check remove from tableau
+            if (cardInfo.location == Location.TABLEAU) {
+                possible = tableaus.get(cardInfo.col).isCardRemovable(cardInfo.row);
+                // Check remove from foundation
+            } else if (cardInfo.location == Location.FOUNDATION) {
                 possible = true;
             }
         }
-
         return possible;
-    }
-
-    public CardStack findStack(int col, int stackType){
-        if(stackType == TABLEAU) return tableaus.get(col);
-        else return foundations.get(col);
     }
 
     public void drawCardFromDeck(){
         //TODO: If deck empty need to swap them.
         if(stock.cardsRemaining() == 0){
-            returnStock();
+            if(wastePile.size() == 0) return; // Waste pile and deck both empty.
+            while (wastePile.cardsRemaining() != 0){
+                Card c = wastePile.popTop();
+                c.turnCard();
+                stock.pushTop(c);
+            }
         }
         Card c = stock.popTop();
         c.turnCard();
         wastePile.pushTop(c);
-    }
-
-    public void returnStock(){
-        while (wastePile.cardsRemaining() != 0){
-            Card c = wastePile.popTop();
-            c.turnCard();
-            stock.pushTop(c);
-        }
-    }
-
-    private void resetSelected(){
-        firstCardSelected = false;
-        firstCard = null;
-        secondCard = null;
     }
 }

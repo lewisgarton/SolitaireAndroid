@@ -12,24 +12,20 @@ public class CardImageView extends ImageView implements View.OnClickListener{
     public int cardId;
     public CardLocation location;
     public int cardImage;
+    public boolean faceUp;
 
-    public CardImageView(Context context, String text, int cardId, int col, int row, int type){
+    public CardImageView(Context context, int cardId, boolean faceUp, int col, int row, SolitaireGame.Location location){
         super(context);
-        location = new CardLocation(cardId, col, row, type);
+        this.location = new CardLocation(cardId, faceUp, col, row, location);
         this.cardId = cardId;
+        this.faceUp = faceUp;
         int id = setCardImageId();
         setImageResource(id);
-
-
-
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 250);
         lp.setMargins(0, 0, 0, -210);
         setLayoutParams(lp);
-
         mainActivity = (MainActivity) getContext();
         setOnClickListener(this);
-
-
     }
 
     @Override
@@ -40,8 +36,10 @@ public class CardImageView extends ImageView implements View.OnClickListener{
     }
 
     public int setCardImageId() {
+
         int id = 0;
-        if (cardId == 101) id = R.drawable.clubs_a;
+        if (!faceUp) id = R.drawable.unknown;
+        else if (cardId == 101) id = R.drawable.clubs_a;
         else if (cardId == 102) id = R.drawable.clubs_2;
         else if (cardId == 103) id = R.drawable.clubs_3;
         else if (cardId == 104) id = R.drawable.clubs_4;
@@ -93,9 +91,7 @@ public class CardImageView extends ImageView implements View.OnClickListener{
         else if (cardId == 411) id = R.drawable.hearts_j;
         else if (cardId == 412) id = R.drawable.hearts_q;
         else if (cardId == 413) id = R.drawable.hearts_k;
-        else if (cardId == SolitaireGame.FACE_DOWN) id = R.drawable.unknown;
-        else if (cardId == SolitaireGame.EMPTY_CARD) id = R.drawable.empty_stack;
-        else id = R.drawable.unknown;
+        else if (cardId == -1) id = R.drawable.empty_stack;
         return id;
     }
 }
