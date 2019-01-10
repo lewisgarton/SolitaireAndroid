@@ -1,7 +1,5 @@
 package com.example.lewis.solitairtest.solitairLogic;
 
-import android.util.Log;
-
 import com.example.lewis.solitairtest.MainActivity;
 
 import java.util.ArrayList;
@@ -20,8 +18,8 @@ public class SolitaireGame {
     public ArrayList<Tableau> tableaus;
 
     public boolean firstCardSelected = false;
-    public CardLocation firstCard = null;
-    public CardLocation secondCard = null;
+    public CardInfo firstCard = null;
+    public CardInfo secondCard = null;
 
     public void resetBoard() {
         // Setup the decks
@@ -45,13 +43,13 @@ public class SolitaireGame {
             tableaus.add(t);
         }
     }
-    public void cardClicked(CardLocation cardA, CardLocation cardB){
+    public void cardClicked(CardInfo cardA, CardInfo cardB){
         firstCard = null;
         cardClicked(cardA);
         cardClicked(cardB);
     }
 
-    public void cardClicked(CardLocation cardInfo) {
+    public void cardClicked(CardInfo cardInfo) {
         int tabsize = 0;
 
         //Return if fist card selected is an empty slot
@@ -93,7 +91,7 @@ public class SolitaireGame {
     }
 
 
-    public void flip(CardLocation cardInfo){
+    public void flip(CardInfo cardInfo){
         tableaus.get(cardInfo.col).cardAt(cardInfo.row).isFaceUp = true;
     }
 
@@ -101,7 +99,7 @@ public class SolitaireGame {
         MainActivity.log(id, msg);
     }
 
-    public void move(CardLocation cardBInfo) {
+    public void move(CardInfo cardBInfo) {
         Card cardA = null;
         CardStack stack;
 
@@ -127,7 +125,7 @@ public class SolitaireGame {
         }
     }
 
-    public boolean isLegalMove(CardLocation cardBInfo){
+    public boolean isLegalMove(CardInfo cardBInfo){
         Card cardA = null;
         boolean isLegal = false;
 
@@ -151,7 +149,7 @@ public class SolitaireGame {
         return isLegal;
     }
 
-    public boolean removePossible(CardLocation cardInfo){
+    public boolean removePossible(CardInfo cardInfo){
         boolean possible = false;
         // Removing card from the top of the wastepile
         if(cardInfo.location == Location.WASTEPILE && wastePile.viewTop() != null) {

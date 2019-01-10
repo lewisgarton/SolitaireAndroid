@@ -1,90 +1,32 @@
 package com.example.lewis.solitairtest.solitairLogic;
 
 import android.content.Context;
-import android.util.Log;
-import android.view.*;
-import android.widget.*;
-import android.content.*;
-import com.example.lewis.solitairtest.MainActivity;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+
 import com.example.lewis.solitairtest.R;
-import com.example.lewis.solitairtest.solitairLogic.*;
 
-public class CardImageView extends ImageView implements View.OnClickListener, View.OnTouchListener, View.OnDragListener {
-    public MainActivity mainActivity;
-    public int cardId;
-    public CardLocation location;
-    public int cardImage;
-    public boolean faceUp;
-    public CardImageView child = null;
-    public Context context;
+public class PlayingCardImageView extends ImageView {
+    int imageId;
 
-    public CardImageView(Context context, int cardId, boolean faceUp, int col, int row, SolitaireGame.Location location){
+    public PlayingCardImageView(Context context, int cardId, boolean faceUp, boolean isTopCard){
         super(context);
-        this.context = context;
-        this.location = new CardLocation(cardId, faceUp, col, row, location);
-        this.cardId = cardId;
-        this.faceUp = faceUp;
-        int id = setCardImageId();
-        setImageResource(id);
+        // Figure out the resource id
+        imageId = setCardImageId(cardId, faceUp);
+        setImageResource(imageId);
+        //Set layout params
+        //TODO fix this!
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 250);
-        lp.setMargins(0, 0, 0, -210);
+
+        // Don't set a margin if the card is a top card
+        if(isTopCard) lp.setMargins(0, 0, 0, 0);
+        else lp.setMargins(0, 0, 0, -150);
+
         setLayoutParams(lp);
-        mainActivity = (MainActivity) getContext();
-        setOnClickListener(this);
-        setOnTouchListener(this);
-        setOnDragListener(this);
     }
 
-    @Override
-    public void onClick(View v) {
-        mainActivity.selectedCard = location;
-        mainActivity.update();
-        Toast.makeText(getContext(), "" + this.cardId, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        // Disallow draging of face down cards and placeholder cards
-        if(!location.faceUp || location.cardId == -1) return false;
-        if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            mainActivity.selectedCard = location;
-            ClipData data = ClipData.newPlainText("", "");
-
-
-            DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
-            v.startDrag(data, shadowBuilder, v, 0);
-
-
-
-
-
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean onDrag(View v, DragEvent event){
-        if(event.getAction() == DragEvent.ACTION_DROP){
-            mainActivity.destinationCard = location;
-            mainActivity.update();
-            CardImageView view = (CardImageView) event.getLocalState();
-            MainActivity.log("CARD DROPPED", "" + view.location);
-        }
-
-        return true;
-    }
-/*
-    @Override
-    public boolean onDragEvent(DragEvent drag){
-        if(drag.ACTION_DROP)
-        return false;
-    }
-*/
-
-
-    public int setCardImageId() {
+    public int setCardImageId(int cardId, boolean faceUp) {
 
         int id = 0;
         if (!faceUp) id = R.drawable.unknown;
@@ -143,6 +85,4 @@ public class CardImageView extends ImageView implements View.OnClickListener, Vi
         else if (cardId == -1) id = R.drawable.empty_stack;
         return id;
     }
-
-
 }

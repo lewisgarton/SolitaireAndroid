@@ -17,12 +17,12 @@ public class MainActivity extends Activity {
     //public ArrayList<FrameLayout> foundations = new ArrayList<FrameLayout>();
     //public ArrayList<LinearLayout> tableauLayouts = new ArrayList<LinearLayout>();
     public SolitaireGame game;
-    public CardLocation selectedCard, destinationCard;
+    public CardInfo selectedCard, destinationCard;
     public boolean stateChanged;
     public ArrayList<FrameLayout> foundations = new ArrayList<>();
     public ArrayList<LinearLayout> tableauLayouts = new ArrayList<LinearLayout>();
     public int deviceWidth, deviceHeight, colSize, rowSize;
-
+    public CardInfo cardInfo;
 
 
 
@@ -98,36 +98,49 @@ public class MainActivity extends Activity {
     public void updateTableus() {
         // Create the card placement frames
         clear();
-
+        PlayingCardView cardView = null;
+        boolean top = false;
 
         if(game.stock.size() > 0) {
             Card c = game.stock.viewTop();
-            deckFrame.addView(new CardImageView(this, c.getCardId(), false, 0, 0, SolitaireGame.Location.STOCK));
+            cardInfo = new CardInfo(c.getCardId(), false, 0, 0, SolitaireGame.Location.STOCK);
+            deckFrame.addView(new PlayingCardView(this, cardInfo, true));
         } else {
-            deckFrame.addView(new CardImageView(this, -1, true, 0, 0, SolitaireGame.Location.STOCK));
+            cardInfo = new CardInfo(-1, true, 0, 0, SolitaireGame.Location.STOCK);
+            deckFrame.addView(new PlayingCardView(this, cardInfo, true));
         }
 
         if(game.wastePile.size() > 0) {
             Card c = game.wastePile.viewTop();
-            deckTopFrame.addView(new CardImageView(this, c.getCardId(), c.isFaceUp,  0, 0, SolitaireGame.Location.WASTEPILE));
+            cardInfo = new CardInfo(c.getCardId(), c.isFaceUp,  0, 0, SolitaireGame.Location.WASTEPILE);
+            deckTopFrame.addView(new PlayingCardView(this, cardInfo, true));
         }
 
-        // linking to child views
-        CardImageView prevCardView = null;
+        PlayingCardView currentCardView, prevCardView = null;
 
         Tableau t;
         for (int i = 0; i < game.tableaus.size(); i++) {
             t = game.tableaus.get(i);
-            prevCardView = null;
             if(t.size() == 0){
-                tableauLayouts.get(i).addView(new CardImageView(this, -1, true, i, -1, SolitaireGame.Location.TABLEAU));
+                cardInfo = new CardInfo(-1, true, i, -1, SolitaireGame.Location.TABLEAU);
+                tableauLayouts.get(i).addView(new PlayingCardView(this, cardInfo, true));
             }else {
+                top = false;
                 for (int j = 0; j < t.size(); j++) {
                     Card c = t.cardAt(j);
-                    CardImageView cardView = new CardImageView(this, c.getCardId(), c.isFaceUp, i, j, SolitaireGame.Location.TABLEAU);
-                    if(prevCardView != null) prevCardView.child = cardView;
-                    prevCardView = cardView;
-                    tableauLayouts.get(i).addView(cardView);
+                    cardInfo = new CardInfo(c.getCardId(), c.isFaceUp, i, j, SolitaireGame.Location.TABLEAU);
+
+                    //flag the top card
+                    if(j == t.size()-1) top = true;
+
+                    currentCardView = new PlayingCardView(this, cardInfo, top);
+                    //If its the first card, add it to the tableau linear layout
+                    //If its not then add the card to the previous cards layout
+                    if(j==0) tableauLayouts.get(i).addView(currentCardView);
+                    else prevCardView.addView(currentCardView);
+
+                    prevCardView = currentCardView;
+
                 }
             }
         }
@@ -152,9 +165,11 @@ public class MainActivity extends Activity {
             f = game.foundations.get(i);
             if (f.size() > 0) {
                 Card c = f.viewTopCard();
-                foundations.get(i).addView(new CardImageView(this, c.getCardId(), c.isFaceUp, i, 0, SolitaireGame.Location.FOUNDATION));
+                cardInfo = new CardInfo(c.getCardId(), c.isFaceUp, i, 0, SolitaireGame.Location.FOUNDATION);
+                foundations.get(i).addView(new PlayingCardView(this, cardInfo, true));
             } else {
-                foundations.get(i).addView(new CardImageView(this, -1, true, i, -1, SolitaireGame.Location.FOUNDATION));
+                cardInfo = new CardInfo(-1, true, i, -1, SolitaireGame.Location.FOUNDATION);
+                foundations.get(i).addView(new PlayingCardView(this, cardInfo, true));
             }
         }
     }
