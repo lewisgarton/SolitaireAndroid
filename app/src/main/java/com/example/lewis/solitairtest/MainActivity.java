@@ -8,9 +8,21 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import com.example.lewis.solitairtest.solitairLogic.*;
+
+import com.example.lewis.solitairtest.solitairLogic.Card;
+import com.example.lewis.solitairtest.solitairLogic.CardInfo;
+import com.example.lewis.solitairtest.solitairLogic.Foundation;
+import com.example.lewis.solitairtest.solitairLogic.PlayingCardView;
+import com.example.lewis.solitairtest.solitairLogic.SolitaireGame;
+import com.example.lewis.solitairtest.solitairLogic.Tableau;
+
 import java.util.ArrayList;
 
+/**
+ * MainActivity is the GUI entity for the solitaire game
+ * All layout is created in code depending on the device screen resolution
+ * Passes messages of to the SolitaireGame class and updates activity on each user input.
+ */
 public class MainActivity extends Activity {
     public ArrayList<ImageView> cardViews = new ArrayList<ImageView>();
     public FrameLayout deckFrame, deckTopFrame;
@@ -24,8 +36,11 @@ public class MainActivity extends Activity {
     public int deviceWidth, deviceHeight, colSize, rowSize;
     public CardInfo cardInfo;
 
-
-
+    /**
+     * onCreate method sets up the GUI and initializes the game.
+     * If a current game is saved in savedInstanceState it will be loaded.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //Get the device resolution
@@ -33,8 +48,8 @@ public class MainActivity extends Activity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         deviceHeight = displayMetrics.heightPixels;
         deviceWidth = displayMetrics.widthPixels;
-        colSize = (int) deviceWidth/7;
-        rowSize = (int) deviceHeight/15;
+        colSize = (int) deviceWidth / 7;
+        rowSize = (int) deviceHeight / 15;
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -47,14 +62,13 @@ public class MainActivity extends Activity {
         LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.layout_tableaus);
 
 
-
-        for(int i = 0; i < 7; i++) {
+        for (int i = 0; i < 7; i++) {
             // Set up to row layouts
             FrameLayout l = new FrameLayout(this);
             l.setLayoutParams(new LinearLayout.LayoutParams(colSize, ViewGroup.LayoutParams.MATCH_PARENT));
-            if(i == 0) deckFrame = l;
-            if(i == 1) deckTopFrame = l;
-            if(i > 2) foundations.add(l);
+            if (i == 0) deckFrame = l;
+            if (i == 1) deckTopFrame = l;
+            if (i > 2) foundations.add(l);
             top_layout.addView(l);
 
             // Set up bottom layouts
@@ -82,26 +96,36 @@ public class MainActivity extends Activity {
         update();
     }
 
+
+    /**
+     * Update communicates with the game logic when the user selects a card or drags card(s) onto
+     * another card, update then calls drawTableus and drawFoundations as necessary.     *
+     */
     public void update() {
-        if(selectedCard != null && destinationCard == null){
+        if (selectedCard != null && destinationCard == null) {
             game.cardClicked(selectedCard);
             selectedCard = null;
-        } else if(selectedCard != null && destinationCard != null){
+        } else if (selectedCard != null && destinationCard != null) {
             game.cardClicked(selectedCard, destinationCard);
             selectedCard = null;
             destinationCard = null;
         }
-        updateTableus();
-        updateFoundations();
+        drawTableus();
+        drawFoundations();
     }
 
-    public void updateTableus() {
+
+    /**
+     * drawTableus retrieves the content's of each tableau from the game, creates and adds
+     * views representing each card.
+     */
+    public void drawTableus() {
         // Create the card placement frames
         clear();
         PlayingCardView cardView = null;
         boolean top = false;
 
-        if(game.stock.size() > 0) {
+        if (game.stock.size() > 0) {
             Card c = game.stock.viewTop();
             cardInfo = new CardInfo(c.getCardId(), false, 0, 0, SolitaireGame.Location.STOCK);
             deckFrame.addView(new PlayingCardView(this, cardInfo, true));
@@ -110,9 +134,9 @@ public class MainActivity extends Activity {
             deckFrame.addView(new PlayingCardView(this, cardInfo, true));
         }
 
-        if(game.wastePile.size() > 0) {
+        if (game.wastePile.size() > 0) {
             Card c = game.wastePile.viewTop();
-            cardInfo = new CardInfo(c.getCardId(), c.isFaceUp,  0, 0, SolitaireGame.Location.WASTEPILE);
+            cardInfo = new CardInfo(c.getCardId(), c.isFaceUp, 0, 0, SolitaireGame.Location.WASTEPILE);
             deckTopFrame.addView(new PlayingCardView(this, cardInfo, true));
         }
 
@@ -121,22 +145,22 @@ public class MainActivity extends Activity {
         Tableau t;
         for (int i = 0; i < game.tableaus.size(); i++) {
             t = game.tableaus.get(i);
-            if(t.size() == 0){
+            if (t.size() == 0) {
                 cardInfo = new CardInfo(-1, true, i, -1, SolitaireGame.Location.TABLEAU);
                 tableauLayouts.get(i).addView(new PlayingCardView(this, cardInfo, true));
-            }else {
+            } else {
                 top = false;
                 for (int j = 0; j < t.size(); j++) {
                     Card c = t.cardAt(j);
                     cardInfo = new CardInfo(c.getCardId(), c.isFaceUp, i, j, SolitaireGame.Location.TABLEAU);
 
                     //flag the top card
-                    if(j == t.size()-1) top = true;
+                    if (j == t.size() - 1) top = true;
 
                     currentCardView = new PlayingCardView(this, cardInfo, top);
                     //If its the first card, add it to the tableau linear layout
                     //If its not then add the card to the previous cards layout
-                    if(j==0) tableauLayouts.get(i).addView(currentCardView);
+                    if (j == 0) tableauLayouts.get(i).addView(currentCardView);
                     else prevCardView.addView(currentCardView);
 
                     prevCardView = currentCardView;
@@ -146,6 +170,9 @@ public class MainActivity extends Activity {
         }
     }
 
+    /**
+     * clear removes all views from the layouts so they are ready to be redrawn.
+     */
     public void clear() {
         for (int i = 0; i < tableauLayouts.size(); i++) {
             tableauLayouts.get(i).removeAllViews();
@@ -158,7 +185,11 @@ public class MainActivity extends Activity {
         deckTopFrame.removeAllViews();
     }
 
-    public void updateFoundations() {
+    /**
+     * drawFoundation retrieves the content's of each foundation from the game, creates and adds
+     * views representing each card.
+     */
+    public void drawFoundations() {
         Foundation f;
 
         for (int i = 0; i < game.foundations.size(); i++) {
@@ -174,6 +205,11 @@ public class MainActivity extends Activity {
         }
     }
 
+    /**
+     * log is a simple wrapper for debug logging, debug will be better implementer in the future.
+     * @param id Type of message.
+     * @param msg Message.
+     */
     public static void log(String id, String msg) {
         Log.i(id, msg);
         //Log.i("2nd card: ", "" + destinationCard.cardId);

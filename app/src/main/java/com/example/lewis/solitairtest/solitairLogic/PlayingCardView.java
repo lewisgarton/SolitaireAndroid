@@ -7,6 +7,13 @@ import android.content.*;
 import com.example.lewis.solitairtest.MainActivity;
 import com.example.lewis.solitairtest.R;
 
+/**
+ * PlayingCardView is a extension of linear layout for holding a cardImageView.
+ * This view allows for cards to be stacked and moved as a unit by encapsulating them in the parent
+ * cards view.
+ * This class also responds to users clicks and drags by implementation of OnClickListner, OnTouchListner
+ * and OnDragListner.
+ */
 public class PlayingCardView extends LinearLayout implements View.OnClickListener, View.OnTouchListener, View.OnDragListener {
     public MainActivity mainActivity;
     public CardInfo cardInfo;
@@ -33,7 +40,10 @@ public class PlayingCardView extends LinearLayout implements View.OnClickListene
         setOnDragListener(this);
     }
 
-
+    /**
+     * onClick registers the clicked view with the game and issues an update a game update request.
+     * @param v
+     */
     @Override
     public void onClick(View v) {
         mainActivity.selectedCard = cardInfo;
@@ -41,6 +51,12 @@ public class PlayingCardView extends LinearLayout implements View.OnClickListene
         Toast.makeText(getContext(), "" + this.cardInfo.cardId, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * onTouch registers the card that is being dragged with the game, it also creates the dragShadow.
+     * @param v
+     * @param event
+     * @return
+     */
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int touchX, touchY;
@@ -63,6 +79,12 @@ public class PlayingCardView extends LinearLayout implements View.OnClickListene
         }
     }
 
+    /**
+     * onDrag registers the view that the dragged card was dropped on with the game and issues an update request.
+     * @param v
+     * @param event
+     * @return
+     */
     @Override
     public boolean onDrag(View v, DragEvent event){
         if(event.getAction() == DragEvent.ACTION_DROP){

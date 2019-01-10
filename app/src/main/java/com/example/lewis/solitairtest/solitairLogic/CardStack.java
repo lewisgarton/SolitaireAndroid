@@ -7,7 +7,7 @@ public abstract class CardStack {
 
     public abstract boolean pushCheck(Card card);
 
-    public abstract boolean isCardRemovable(int i);
+    public abstract boolean popCheck(int i);
 
     public void pushCard(Card card) {
         cards.add(card);

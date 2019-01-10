@@ -7,9 +7,20 @@ import android.widget.LinearLayout;
 
 import com.example.lewis.solitairtest.R;
 
+/**
+ * PlayingCardImageView is an extension of ImageView, it encapsulates the required initialization
+ * for each card.
+ */
 public class PlayingCardImageView extends ImageView {
     int imageId;
 
+    /**
+     * Constructor sets card image and layout parameters.
+     * @param context
+     * @param cardId
+     * @param faceUp
+     * @param isTopCard
+     */
     public PlayingCardImageView(Context context, int cardId, boolean faceUp, boolean isTopCard){
         super(context);
         // Figure out the resource id
@@ -26,6 +37,13 @@ public class PlayingCardImageView extends ImageView {
         setLayoutParams(lp);
     }
 
+    /**
+     * setCardImage is a temporary class for resolving cardIds to image resource ids.
+     * This is to be fixed in the future.
+     * @param cardId
+     * @param faceUp
+     * @return
+     */
     public int setCardImageId(int cardId, boolean faceUp) {
 
         int id = 0;

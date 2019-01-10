@@ -28,7 +28,7 @@ public class Foundation extends CardStack {
     }
 
     @Override
-    public boolean isCardRemovable(int i) {
+    public boolean popCheck(int i) {
         return cards.size() > 0 && i == cards.size() - 1;
     }
 

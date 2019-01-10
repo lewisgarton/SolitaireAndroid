@@ -1,5 +1,10 @@
 package com.example.lewis.solitairtest.solitairLogic;
 
+
+/**
+ * CardInfo is a simple class that contains all the required information about a card that the
+ * GUI should need, this could do with rethinking in the future
+ */
 public class CardInfo {
     public int cardId, col, row;
     SolitaireGame.Location location;

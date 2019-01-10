@@ -4,6 +4,12 @@ import com.example.lewis.solitairtest.MainActivity;
 
 import java.util.ArrayList;
 
+/**
+ * SolitaireGame is the main 'driver' of the solitaire game.
+ * It sets up a 'board' for the game to be played, deals and movers the cards in response to the
+ * users input from the GUI.
+ * Information from the gui representing cards must be in the form of a cardInfo.
+ */
 public class SolitaireGame {
     public final boolean DEBUG_MODE = true;
     public enum Location {
@@ -21,6 +27,11 @@ public class SolitaireGame {
     public CardInfo firstCard = null;
     public CardInfo secondCard = null;
 
+    /**
+     * resetBoard creates a new game, this involves creating a new deck and dealing the
+     * cards on the tableau's.
+     * This method is called on creation and also when the game is restarted.
+     */
     public void resetBoard() {
         // Setup the decks
         stock = new Deck(Deck.DeckType.STANDARD_NO_JOKERS);
@@ -43,12 +54,25 @@ public class SolitaireGame {
             tableaus.add(t);
         }
     }
+
+    /**
+     * cardClicked is a temporary wrapper overload for the single card cardClicked method.
+     * When a user drags a card onto another the single cardClicked is called twice with each
+     * card.
+     * @param cardA Card(s) being moved
+     * @param cardB Card receiving cardA
+     */
     public void cardClicked(CardInfo cardA, CardInfo cardB){
         firstCard = null;
         cardClicked(cardA);
         cardClicked(cardB);
     }
 
+    /**
+     * cardClicked interprets card clicks from the user to game actions such as clicking a face down
+     * card, moving a card or cards to other positions on the board.
+     * @param cardInfo
+     */
     public void cardClicked(CardInfo cardInfo) {
         int tabsize = 0;
 
@@ -91,14 +115,29 @@ public class SolitaireGame {
     }
 
 
+    /**
+     * flips the cardinfo boolean that indicates if the the card is face up.
+     * @param cardInfo
+     */
     public void flip(CardInfo cardInfo){
         tableaus.get(cardInfo.col).cardAt(cardInfo.row).isFaceUp = true;
     }
 
+    /**
+     * log is a wrapper for debugging with log
+     * @param id
+     * @param msg
+     */
     public void log(String id, String msg){
         MainActivity.log(id, msg);
     }
 
+    /**
+     * move moves cards on the table, it will call isLegalMove with the corresponding elements
+     * of the table to ensure the removal and placement of the card(s) is legal then move the card(s).
+     * firstCard should already be set if this method has been called.
+     * @param cardBInfo destination cardInfo for firstCard
+     */
     public void move(CardInfo cardBInfo) {
         Card cardA = null;
         CardStack stack;
@@ -125,6 +164,12 @@ public class SolitaireGame {
         }
     }
 
+    /**
+     * isLegalMove will ensure the proposed cad movement is a game legal action.
+     * firstCard must already be set if this method is being called.
+     * @param cardBInfo destination card info
+     * @return true if the move is legal, false otherwise.
+     */
     public boolean isLegalMove(CardInfo cardBInfo){
         Card cardA = null;
         boolean isLegal = false;
@@ -149,6 +194,11 @@ public class SolitaireGame {
         return isLegal;
     }
 
+    /**
+     * removePossible will ensure the proposed card to be moved is a game legal move.
+     * @param cardInfo info of the card to be removed.
+     * @return true if remove is possible, false otherwise.
+     */
     public boolean removePossible(CardInfo cardInfo){
         boolean possible = false;
         // Removing card from the top of the wastepile
@@ -158,7 +208,7 @@ public class SolitaireGame {
         }else if(cardInfo.row >= 0) {
             // Check remove from tableau
             if (cardInfo.location == Location.TABLEAU) {
-                possible = tableaus.get(cardInfo.col).isCardRemovable(cardInfo.row);
+                possible = tableaus.get(cardInfo.col).popCheck(cardInfo.row);
                 // Check remove from foundation
             } else if (cardInfo.location == Location.FOUNDATION) {
                 possible = true;

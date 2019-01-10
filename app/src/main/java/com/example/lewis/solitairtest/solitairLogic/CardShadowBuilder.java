@@ -4,6 +4,11 @@ import android.graphics.Point;
 import android.view.MotionEvent;
 import android.view.View;
 
+
+/**
+ * Class extends DragShadowBuilder to allow for the card to be dragged from the touch point
+ * of the users input rather than the center of the view.
+ */
 public class CardShadowBuilder extends View.DragShadowBuilder {
     int touchX, touchY;
 
