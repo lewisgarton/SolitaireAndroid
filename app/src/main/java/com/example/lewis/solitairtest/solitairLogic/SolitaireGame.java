@@ -2,6 +2,8 @@ package com.example.lewis.solitairtest.solitairLogic;
 
 import android.util.Log;
 
+import com.example.lewis.solitairtest.MainActivity;
+
 import java.util.ArrayList;
 
 public class SolitaireGame {
@@ -42,6 +44,11 @@ public class SolitaireGame {
             t.viewTopCard().turnCard(); //turn the last card on the stack face up
             tableaus.add(t);
         }
+    }
+    public void cardClicked(CardLocation cardA, CardLocation cardB){
+        firstCard = null;
+        cardClicked(cardA);
+        cardClicked(cardB);
     }
 
     public void cardClicked(CardLocation cardInfo) {
@@ -91,7 +98,7 @@ public class SolitaireGame {
     }
 
     public void log(String id, String msg){
-        Log.d(id, msg);
+        MainActivity.log(id, msg);
     }
 
     public void move(CardLocation cardBInfo) {

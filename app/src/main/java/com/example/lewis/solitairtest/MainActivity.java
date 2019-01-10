@@ -3,6 +3,7 @@ package com.example.lewis.solitairtest;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -21,6 +22,9 @@ public class MainActivity extends Activity {
     public ArrayList<FrameLayout> foundations = new ArrayList<>();
     public ArrayList<LinearLayout> tableauLayouts = new ArrayList<LinearLayout>();
     public int deviceWidth, deviceHeight, colSize, rowSize;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,18 +83,22 @@ public class MainActivity extends Activity {
     }
 
     public void update() {
-        if(selectedCard != null){
+        if(selectedCard != null && destinationCard == null){
             game.cardClicked(selectedCard);
             selectedCard = null;
+        } else if(selectedCard != null && destinationCard != null){
+            game.cardClicked(selectedCard, destinationCard);
+            selectedCard = null;
+            destinationCard = null;
         }
         updateTableus();
         updateFoundations();
-        log();
     }
 
     public void updateTableus() {
         // Create the card placement frames
         clear();
+
 
         if(game.stock.size() > 0) {
             Card c = game.stock.viewTop();
@@ -104,15 +112,22 @@ public class MainActivity extends Activity {
             deckTopFrame.addView(new CardImageView(this, c.getCardId(), c.isFaceUp,  0, 0, SolitaireGame.Location.WASTEPILE));
         }
 
+        // linking to child views
+        CardImageView prevCardView = null;
+
         Tableau t;
         for (int i = 0; i < game.tableaus.size(); i++) {
             t = game.tableaus.get(i);
+            prevCardView = null;
             if(t.size() == 0){
                 tableauLayouts.get(i).addView(new CardImageView(this, -1, true, i, -1, SolitaireGame.Location.TABLEAU));
             }else {
                 for (int j = 0; j < t.size(); j++) {
                     Card c = t.cardAt(j);
-                    tableauLayouts.get(i).addView(new CardImageView(this, c.getCardId(), c.isFaceUp, i, j, SolitaireGame.Location.TABLEAU));
+                    CardImageView cardView = new CardImageView(this, c.getCardId(), c.isFaceUp, i, j, SolitaireGame.Location.TABLEAU);
+                    if(prevCardView != null) prevCardView.child = cardView;
+                    prevCardView = cardView;
+                    tableauLayouts.get(i).addView(cardView);
                 }
             }
         }
@@ -144,8 +159,8 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void log() {
-        //Log.i("1st card: ", "" + selectedCard.cardId);
+    public static void log(String id, String msg) {
+        Log.i(id, msg);
         //Log.i("2nd card: ", "" + destinationCard.cardId);
     }
 }

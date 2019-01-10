@@ -1,21 +1,26 @@
 package com.example.lewis.solitairtest.solitairLogic;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
-
+import android.content.*;
 import com.example.lewis.solitairtest.MainActivity;
 import com.example.lewis.solitairtest.R;
+import com.example.lewis.solitairtest.solitairLogic.*;
 
-public class CardImageView extends ImageView implements View.OnClickListener{
+public class CardImageView extends ImageView implements View.OnClickListener, View.OnTouchListener, View.OnDragListener {
     public MainActivity mainActivity;
     public int cardId;
     public CardLocation location;
     public int cardImage;
     public boolean faceUp;
+    public CardImageView child = null;
+    public Context context;
 
     public CardImageView(Context context, int cardId, boolean faceUp, int col, int row, SolitaireGame.Location location){
         super(context);
+        this.context = context;
         this.location = new CardLocation(cardId, faceUp, col, row, location);
         this.cardId = cardId;
         this.faceUp = faceUp;
@@ -26,6 +31,8 @@ public class CardImageView extends ImageView implements View.OnClickListener{
         setLayoutParams(lp);
         mainActivity = (MainActivity) getContext();
         setOnClickListener(this);
+        setOnTouchListener(this);
+        setOnDragListener(this);
     }
 
     @Override
@@ -34,6 +41,48 @@ public class CardImageView extends ImageView implements View.OnClickListener{
         mainActivity.update();
         Toast.makeText(getContext(), "" + this.cardId, Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        // Disallow draging of face down cards and placeholder cards
+        if(!location.faceUp || location.cardId == -1) return false;
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            mainActivity.selectedCard = location;
+            ClipData data = ClipData.newPlainText("", "");
+
+
+            DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+            v.startDrag(data, shadowBuilder, v, 0);
+
+
+
+
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean onDrag(View v, DragEvent event){
+        if(event.getAction() == DragEvent.ACTION_DROP){
+            mainActivity.destinationCard = location;
+            mainActivity.update();
+            CardImageView view = (CardImageView) event.getLocalState();
+            MainActivity.log("CARD DROPPED", "" + view.location);
+        }
+
+        return true;
+    }
+/*
+    @Override
+    public boolean onDragEvent(DragEvent drag){
+        if(drag.ACTION_DROP)
+        return false;
+    }
+*/
+
 
     public int setCardImageId() {
 
@@ -94,4 +143,6 @@ public class CardImageView extends ImageView implements View.OnClickListener{
         else if (cardId == -1) id = R.drawable.empty_stack;
         return id;
     }
+
+
 }
