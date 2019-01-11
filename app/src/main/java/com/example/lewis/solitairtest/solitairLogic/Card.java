@@ -23,6 +23,28 @@ public class Card {
         else isFaceUp = true;
     }
 
+    public Card(String cardId, String isFaceUp){
+        this(Integer.parseInt(cardId), Boolean.parseBoolean(isFaceUp));
+    }
+
+    public Card(int cardId, boolean isFaceUp){
+        this.cardId = cardId;
+        if(cardId >= 400){
+            suit = Suits.HEARTS;
+            number = cardId-400;
+        }else if(cardId >= 300){
+            suit = Suits.DIAMONDS;
+            number = cardId-300;
+        }else if(cardId >= 200){
+            suit = Suits.SPADES;
+            number = cardId-200;
+        }else if(cardId >= 100){
+            suit = Suits.CLUBS;
+            number = cardId-100;
+        }
+        this.isFaceUp = isFaceUp;
+    }
+
     public Card(Suits suit, int number) {
         //TODO check suit, throw exception
         this.suit = suit;

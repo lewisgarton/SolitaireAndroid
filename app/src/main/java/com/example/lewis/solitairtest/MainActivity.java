@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import com.example.lewis.solitairtest.solitairLogic.Card;
 import com.example.lewis.solitairtest.solitairLogic.CardInfo;
 import com.example.lewis.solitairtest.solitairLogic.Foundation;
+import com.example.lewis.solitairtest.solitairLogic.GameState;
 import com.example.lewis.solitairtest.solitairLogic.PlayingCardView;
 import com.example.lewis.solitairtest.solitairLogic.SolitaireGame;
 import com.example.lewis.solitairtest.solitairLogic.Tableau;
@@ -36,6 +37,14 @@ public class MainActivity extends Activity {
     public int deviceWidth, deviceHeight, colSize, rowSize;
     public CardInfo cardInfo;
 
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState){
+        super.onSaveInstanceState(savedInstanceState);
+        GameState gameState = new GameState(game);
+        savedInstanceState.putString("SAVE", gameState.createSave());
+    }
+
+
     /**
      * onCreate method sets up the GUI and initializes the game.
      * If a current game is saved in savedInstanceState it will be loaded.
@@ -43,6 +52,7 @@ public class MainActivity extends Activity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         //Get the device resolution
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -51,10 +61,19 @@ public class MainActivity extends Activity {
         colSize = (int) deviceWidth / 7;
         rowSize = (int) deviceHeight / 15;
 
-        super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         game = new SolitaireGame();
-        game.resetBoard();
+
+        if(savedInstanceState != null){
+            GameState gState = new GameState(game);
+            gState.restoreSave(savedInstanceState.getString("SAVE"));
+        } else {
+            game.resetBoard();
+        }
+
+
+
         stateChanged = true;
         selectedCard = null;
         destinationCard = null;

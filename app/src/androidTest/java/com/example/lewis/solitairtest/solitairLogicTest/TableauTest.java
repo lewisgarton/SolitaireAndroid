@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class TableauTest {
 
-
+/*
     @Test
     public void falseTestPushCheck() {
         Tableau h = new Tableau();
@@ -91,4 +91,4 @@ public class TableauTest {
         }
     }
 
-}
+*/}

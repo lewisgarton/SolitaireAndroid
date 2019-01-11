@@ -19,13 +19,15 @@ public class SolitaireGame {
     private final int NUM_TABLEAUS = 7;
     private final int NUM_FOUNDATIONS = 4;
 
-    public Deck stock, wastePile;
-    public ArrayList<Foundation> foundations;
-    public ArrayList<Tableau> tableaus;
+    public Deck stock = new Deck();
+    public Deck wastePile = new Deck();
+    public ArrayList<Foundation> foundations = new ArrayList<>();
+    public ArrayList<Tableau> tableaus = new ArrayList<>();
 
     public boolean firstCardSelected = false;
     public CardInfo firstCard = null;
     public CardInfo secondCard = null;
+
 
     /**
      * resetBoard creates a new game, this involves creating a new deck and dealing the

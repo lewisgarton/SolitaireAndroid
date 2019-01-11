@@ -45,6 +45,9 @@ public class Deck {
         return cards.get(cards.size() - 1);
     }
 
+    public Card cardAt(int i){
+        return cards.get(i);
+    }
     public int cardsRemaining() {
         return cards.size();
     }
