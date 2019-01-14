@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.example.lewis.solitairtest.MainActivity;
 import com.example.lewis.solitairtest.R;
 
 /**
@@ -28,7 +29,7 @@ public class PlayingCardImageView extends ImageView {
         setImageResource(imageId);
         //Set layout params
         //TODO fix this!
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 250);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, MainActivity.cardHeight);
 
         // Don't set a margin if the card is a top card
         if(isTopCard) lp.setMargins(0, 0, 0, 0);

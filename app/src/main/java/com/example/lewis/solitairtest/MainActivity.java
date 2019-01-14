@@ -39,7 +39,11 @@ public class MainActivity extends Activity {
 
 
 
-    public int deviceWidth, deviceHeight, colSize, rowSize;
+    public int deviceWidth;
+    public int deviceHeight;
+    public int colSize;
+    public int rowSize;
+    public static int cardHeight;
     public CardInfo cardInfo;
 
     /**
@@ -87,6 +91,8 @@ public class MainActivity extends Activity {
         deviceWidth = displayMetrics.widthPixels;
         colSize = (int) deviceWidth / 7;
         rowSize = (int) deviceHeight / 15;
+
+        cardHeight = deviceHeight/5;
 
 
         setContentView(R.layout.activity_main);
