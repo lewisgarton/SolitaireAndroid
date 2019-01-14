@@ -2,6 +2,7 @@ package com.example.lewis.solitairtest;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -27,15 +28,41 @@ import java.util.ArrayList;
 public class MainActivity extends Activity {
     public ArrayList<ImageView> cardViews = new ArrayList<ImageView>();
     public FrameLayout deckFrame, deckTopFrame;
-    //public ArrayList<FrameLayout> foundations = new ArrayList<FrameLayout>();
+    //public ArrayList<FrameLayout> foundationFrames = new ArrayList<FrameLayout>();
     //public ArrayList<LinearLayout> tableauLayouts = new ArrayList<LinearLayout>();
     public SolitaireGame game;
     public CardInfo selectedCard, destinationCard;
     public boolean stateChanged;
-    public ArrayList<FrameLayout> foundations = new ArrayList<>();
-    public ArrayList<LinearLayout> tableauLayouts = new ArrayList<LinearLayout>();
+
+    public ArrayList<FrameLayout> foundationFrames;
+    public ArrayList<LinearLayout> tableauLayouts;
+
+
+
     public int deviceWidth, deviceHeight, colSize, rowSize;
     public CardInfo cardInfo;
+
+    /**
+     * Finds views and populates view lists "foundationFrames" and "tableauLayouts".
+     */
+    protected void getLayouts(){
+        foundationFrames = new ArrayList<>();
+        deckFrame = ((FrameLayout) findViewById(R.id.frame_foundation_0));
+        deckTopFrame = ((FrameLayout) findViewById(R.id.frame_foundation_1));
+        foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation_3));
+        foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation_4));
+        foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation_5));
+        foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation_6));
+
+        tableauLayouts = new ArrayList<>();
+        tableauLayouts.add((LinearLayout) findViewById(R.id.layout_tableau_0));
+        tableauLayouts.add((LinearLayout) findViewById(R.id.layout_tableau_1));
+        tableauLayouts.add((LinearLayout) findViewById(R.id.layout_tableau_2));
+        tableauLayouts.add((LinearLayout) findViewById(R.id.layout_tableau_3));
+        tableauLayouts.add((LinearLayout) findViewById(R.id.layout_tableau_4));
+        tableauLayouts.add((LinearLayout) findViewById(R.id.layout_tableau_5));
+        tableauLayouts.add((LinearLayout) findViewById(R.id.layout_tableau_6));
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState){
@@ -77,7 +104,11 @@ public class MainActivity extends Activity {
         stateChanged = true;
         selectedCard = null;
         destinationCard = null;
-        LinearLayout top_layout = (LinearLayout) findViewById(R.id.layout_foundations);
+        getLayouts();
+        update();
+
+        /*
+        LinearLayout top_layout = (LinearLayout) findViewById(R.id.layout_foundationFrames);
         LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.layout_tableaus);
 
 
@@ -87,7 +118,6 @@ public class MainActivity extends Activity {
             l.setLayoutParams(new LinearLayout.LayoutParams(colSize, ViewGroup.LayoutParams.MATCH_PARENT));
             if (i == 0) deckFrame = l;
             if (i == 1) deckTopFrame = l;
-            if (i > 2) foundations.add(l);
             top_layout.addView(l);
 
             // Set up bottom layouts
@@ -99,10 +129,11 @@ public class MainActivity extends Activity {
         }
 
 
-        //foundations.add((FrameLayout) findViewById(R.id.frame_foundation1));
-        //foundations.add((FrameLayout) findViewById(R.id.frame_foundation2));
-        //foundations.add((FrameLayout) findViewById(R.id.frame_foundation3));
-        //foundations.add((FrameLayout) findViewById(R.id.frame_foundation4));
+
+        //foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation1));
+        //foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation2));
+        //foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation3));
+        //foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation4));
         //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau1));
         //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau2));
         //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau3));
@@ -110,15 +141,17 @@ public class MainActivity extends Activity {
         //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau5));
         //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau6));
         //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau7));
-        //deckFrame = foundations.get(0);
-        //deckTopFrame = foundations.get(1);
-        update();
+        //deckFrame = foundationFrames.get(0);
+        //deckTopFrame = foundationFrames.get(1);
+
+        */
+
     }
 
 
     /**
      * Update communicates with the game logic when the user selects a card or drags card(s) onto
-     * another card, update then calls drawTableus and drawFoundations as necessary.     *
+     * another card, update then calls drawTableus and drawfoundationFrames as necessary.     *
      */
     public void update() {
         if (selectedCard != null && destinationCard == null) {
@@ -129,8 +162,9 @@ public class MainActivity extends Activity {
             selectedCard = null;
             destinationCard = null;
         }
+        clear();
         drawTableus();
-        drawFoundations();
+        drawfoundationFrames();
     }
 
 
@@ -140,7 +174,7 @@ public class MainActivity extends Activity {
      */
     public void drawTableus() {
         // Create the card placement frames
-        clear();
+
         PlayingCardView cardView = null;
         boolean top = false;
 
@@ -197,8 +231,8 @@ public class MainActivity extends Activity {
             tableauLayouts.get(i).removeAllViews();
         }
 
-        for (int i = 0; i < foundations.size(); i++) {
-            foundations.get(i).removeAllViews();
+        for (int i = 0; i < foundationFrames.size(); i++) {
+            foundationFrames.get(i).removeAllViews();
         }
         deckFrame.removeAllViews();
         deckTopFrame.removeAllViews();
@@ -208,7 +242,7 @@ public class MainActivity extends Activity {
      * drawFoundation retrieves the content's of each foundation from the game, creates and adds
      * views representing each card.
      */
-    public void drawFoundations() {
+    public void drawfoundationFrames() {
         Foundation f;
 
         for (int i = 0; i < game.foundations.size(); i++) {
@@ -216,10 +250,10 @@ public class MainActivity extends Activity {
             if (f.size() > 0) {
                 Card c = f.viewTopCard();
                 cardInfo = new CardInfo(c.getCardId(), c.isFaceUp, i, 0, SolitaireGame.Location.FOUNDATION);
-                foundations.get(i).addView(new PlayingCardView(this, cardInfo, true));
+                foundationFrames.get(i).addView(new PlayingCardView(this, cardInfo, true));
             } else {
                 cardInfo = new CardInfo(-1, true, i, -1, SolitaireGame.Location.FOUNDATION);
-                foundations.get(i).addView(new PlayingCardView(this, cardInfo, true));
+                foundationFrames.get(i).addView(new PlayingCardView(this, cardInfo, true));
             }
         }
     }
