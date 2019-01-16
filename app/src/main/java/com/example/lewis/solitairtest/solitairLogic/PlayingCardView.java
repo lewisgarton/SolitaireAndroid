@@ -24,7 +24,7 @@ public class PlayingCardView extends LinearLayout implements View.OnClickListene
         super(context);
         this.isTopCard = isTopCard;
         setOrientation(VERTICAL);
-        setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         this.context = context;
         this.cardInfo = cardInfo;

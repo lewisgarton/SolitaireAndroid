@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
 
 
     public int deviceWidth;
-    public int deviceHeight;
+    public static int deviceHeight;
     public int colSize;
     public int rowSize;
     public static int cardHeight;
@@ -51,8 +51,8 @@ public class MainActivity extends Activity {
      */
     protected void getLayouts(){
         foundationFrames = new ArrayList<>();
-        deckFrame = ((FrameLayout) findViewById(R.id.frame_foundation_0));
-        deckTopFrame = ((FrameLayout) findViewById(R.id.frame_foundation_1));
+        deckFrame = ((FrameLayout) findViewById(R.id.frame_deck));
+        deckTopFrame = ((FrameLayout) findViewById(R.id.frame_top_card));
         foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation_3));
         foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation_4));
         foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation_5));
@@ -92,7 +92,7 @@ public class MainActivity extends Activity {
         colSize = (int) deviceWidth / 7;
         rowSize = (int) deviceHeight / 15;
 
-        cardHeight = deviceHeight/5;
+        cardHeight = (int)(deviceHeight/4.7);
 
 
         setContentView(R.layout.activity_main);
