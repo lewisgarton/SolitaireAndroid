@@ -113,45 +113,6 @@ public class MainActivity extends Activity {
         getLayouts();
         update();
 
-        /*
-        LinearLayout top_layout = (LinearLayout) findViewById(R.id.layout_foundationFrames);
-        LinearLayout bottom_layout = (LinearLayout) findViewById(R.id.layout_tableaus);
-
-
-        for (int i = 0; i < 7; i++) {
-            // Set up to row layouts
-            FrameLayout l = new FrameLayout(this);
-            l.setLayoutParams(new LinearLayout.LayoutParams(colSize, ViewGroup.LayoutParams.MATCH_PARENT));
-            if (i == 0) deckFrame = l;
-            if (i == 1) deckTopFrame = l;
-            top_layout.addView(l);
-
-            // Set up bottom layouts
-            LinearLayout k = new LinearLayout(this);
-            k.setLayoutParams(new LinearLayout.LayoutParams(colSize, ViewGroup.LayoutParams.MATCH_PARENT));
-            k.setOrientation(LinearLayout.VERTICAL);
-            bottom_layout.addView(k);
-            tableauLayouts.add(k);
-        }
-
-
-
-        //foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation1));
-        //foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation2));
-        //foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation3));
-        //foundationFrames.add((FrameLayout) findViewById(R.id.frame_foundation4));
-        //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau1));
-        //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau2));
-        //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau3));
-        //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau4));
-        //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau5));
-        //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau6));
-        //tableauLayouts.add((LinearLayout) findViewById(R.id.layout_Tableau7));
-        //deckFrame = foundationFrames.get(0);
-        //deckTopFrame = foundationFrames.get(1);
-
-        */
-
     }
 
 
