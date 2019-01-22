@@ -1,8 +1,5 @@
 package com.example.lewis.solitairtest;
 
-import android.app.Activity;
-import android.content.Context;
-import android.net.Uri;
 import android.support.v4.app.Fragment;
 
 import android.os.Bundle;
@@ -24,6 +21,7 @@ public class MenuFragment extends Fragment {
         btnNewGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
+                ((MainActivity) getContext()).setViewPager(1);
             }
         });
         return v;

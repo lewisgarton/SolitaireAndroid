@@ -3,22 +3,14 @@ package com.example.lewis.solitairtest;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-
-import com.example.lewis.solitairtest.solitairLogic.Card;
-import com.example.lewis.solitairtest.solitairLogic.CardInfo;
-import com.example.lewis.solitairtest.solitairLogic.Foundation;
-import com.example.lewis.solitairtest.solitairLogic.GameState;
-import com.example.lewis.solitairtest.solitairLogic.PlayingCardView;
-import com.example.lewis.solitairtest.solitairLogic.SolitaireGame;
-import com.example.lewis.solitairtest.solitairLogic.Tableau;
+import android.widget.*;
+import com.example.lewis.solitairtest.solitairLogic.*;
 
 import java.util.ArrayList;
 
@@ -27,22 +19,19 @@ public class GameFragment extends Fragment {
     public ArrayList<ImageView> cardViews = new ArrayList<ImageView>();
     public FrameLayout deckFrame, deckTopFrame;
     public SolitaireGame game;
-    public CardInfo selectedCard, destinationCard;
+    public static CardInfo selectedCard, destinationCard;
     public boolean stateChanged;
     public ArrayList<FrameLayout> foundationFrames;
     public ArrayList<LinearLayout> tableauLayouts;
     public CardInfo cardInfo;
     public View v;
+    private DisplayMetrics displayMetrics = new DisplayMetrics();
+    public static int deviceHeight = 0;
 
     @Override
     public Context getContext() {
         return super.getContext();
     }
-
-    public GameFragment() {
-        // Required empty public constructor
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -50,17 +39,19 @@ public class GameFragment extends Fragment {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_game, container, false);
         game = new SolitaireGame();
+        game.resetBoard();
+        ((MainActivity)getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        deviceHeight = displayMetrics.heightPixels;
+        //if(savedInstanceState != null){
+            //GameState gState = new GameState(game);
+            //gState.restoreSave(savedInstanceState.getString("SAVE"));
+        //} else {
+        //    game.resetBoard();
+        //}
 
-        if(savedInstanceState != null){
-            GameState gState = new GameState(game);
-            gState.restoreSave(savedInstanceState.getString("SAVE"));
-        } else {
-            game.resetBoard();
-        }
-
-        stateChanged = true;
-        selectedCard = null;
-        destinationCard = null;
+        //stateChanged = true;
+        //selectedCard = null;
+        //destinationCard = null;
         getLayouts();
         update();
         return v;
@@ -94,6 +85,7 @@ public class GameFragment extends Fragment {
      * another card, update then calls drawTableus and drawfoundationFrames as necessary.     *
      */
     public void update() {
+
         if (selectedCard != null && destinationCard == null) {
             game.cardClicked(selectedCard);
             selectedCard = null;
@@ -103,6 +95,7 @@ public class GameFragment extends Fragment {
             destinationCard = null;
         }
         clear();
+        drawDeck();
         drawTableus();
         drawfoundationFrames();
     }
@@ -112,16 +105,16 @@ public class GameFragment extends Fragment {
         if (game.stock.size() > 0) {
             Card c = game.stock.viewTop();
             cardInfo = new CardInfo(c.getCardId(), false, 0, 0, SolitaireGame.Location.STOCK);
-            deckFrame.addView(new PlayingCardView(getContext(), cardInfo, true));
+            deckFrame.addView(new PlayingCardView(getContext(), this, cardInfo, true));
         } else {
             cardInfo = new CardInfo(-1, true, 0, 0, SolitaireGame.Location.STOCK);
-            deckFrame.addView(new PlayingCardView(getContext(), cardInfo, true));
+            deckFrame.addView(new PlayingCardView(getContext(), this, cardInfo, true));
         }
 
         if (game.wastePile.size() > 0) {
             Card c = game.wastePile.viewTop();
             cardInfo = new CardInfo(c.getCardId(), c.isFaceUp, 0, 0, SolitaireGame.Location.WASTEPILE);
-            deckTopFrame.addView(new PlayingCardView(getContext(), cardInfo, true));
+            deckTopFrame.addView(new PlayingCardView(getContext(), this, cardInfo, true));
         }
     }
 
@@ -137,7 +130,7 @@ public class GameFragment extends Fragment {
             t = game.tableaus.get(i);
             if (t.size() == 0) {
                 cardInfo = new CardInfo(-1, true, i, -1, SolitaireGame.Location.TABLEAU);
-                tableauLayouts.get(i).addView(new PlayingCardView(getContext(), cardInfo, true));
+                tableauLayouts.get(i).addView(new PlayingCardView(getContext(), this, cardInfo, true));
             } else {
                 boolean top = false;
                 for (int j = 0; j < t.size(); j++) {
@@ -147,7 +140,7 @@ public class GameFragment extends Fragment {
                     //flag the top card
                     if (j == t.size() - 1) top = true;
 
-                    currentCardView = new PlayingCardView(getContext(), cardInfo, top);
+                    currentCardView = new PlayingCardView(getContext(), this, cardInfo, top);
                     //If its the first card, add it to the tableau linear layout
                     //If its not then add the card to the previous cards layout
                     if (j == 0) tableauLayouts.get(i).addView(currentCardView);
@@ -187,10 +180,10 @@ public class GameFragment extends Fragment {
             if (f.size() > 0) {
                 Card c = f.viewTopCard();
                 cardInfo = new CardInfo(c.getCardId(), c.isFaceUp, i, 0, SolitaireGame.Location.FOUNDATION);
-                foundationFrames.get(i).addView(new PlayingCardView(getContext(), cardInfo, true));
+                foundationFrames.get(i).addView(new PlayingCardView(getContext(), this, cardInfo, true));
             } else {
                 cardInfo = new CardInfo(-1, true, i, -1, SolitaireGame.Location.FOUNDATION);
-                foundationFrames.get(i).addView(new PlayingCardView(getContext(), cardInfo, true));
+                foundationFrames.get(i).addView(new PlayingCardView(getContext(), this, cardInfo, true));
             }
         }
     }
@@ -204,7 +197,5 @@ public class GameFragment extends Fragment {
         Log.i(id, msg);
         //Log.i("2nd card: ", "" + destinationCard.cardId);
     }
-
-
 
 }

@@ -131,7 +131,7 @@ public class SolitaireGame {
      * @param msg
      */
     public void log(String id, String msg){
-        MainActivity.log(id, msg);
+        //MainActivity.log(id, msg);
     }
 
     /**

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.*;
 import android.widget.*;
 import android.content.*;
+
+import com.example.lewis.solitairtest.GameFragment;
 import com.example.lewis.solitairtest.MainActivity;
 import com.example.lewis.solitairtest.R;
 
@@ -19,9 +21,11 @@ public class PlayingCardView extends LinearLayout implements View.OnClickListene
     public CardInfo cardInfo;
     public Context context;
     public boolean isTopCard = true;
+    public GameFragment game;
 
-    public PlayingCardView(Context context, CardInfo cardInfo, boolean isTopCard){
+    public PlayingCardView(Context context,GameFragment game, CardInfo cardInfo, boolean isTopCard){
         super(context);
+        this.game = game;
         this.isTopCard = isTopCard;
         setOrientation(VERTICAL);
         setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
@@ -34,7 +38,7 @@ public class PlayingCardView extends LinearLayout implements View.OnClickListene
         this.addView(i);
 
 
-        mainActivity = (MainActivity) getContext();
+        //mainActivity = (MainActivity) getContext();
         setOnClickListener(this);
         setOnTouchListener(this);
         setOnDragListener(this);
@@ -46,8 +50,8 @@ public class PlayingCardView extends LinearLayout implements View.OnClickListene
      */
     @Override
     public void onClick(View v) {
-        mainActivity.selectedCard = cardInfo;
-        mainActivity.update();
+        game.selectedCard = cardInfo;
+        game.update();
         Toast.makeText(getContext(), "" + this.cardInfo.cardId, Toast.LENGTH_SHORT).show();
     }
 
@@ -65,7 +69,7 @@ public class PlayingCardView extends LinearLayout implements View.OnClickListene
         // Disallow dragging of face down cards and placeholder cards
         if(!cardInfo.faceUp || cardInfo.cardId == -1) return false;
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            mainActivity.selectedCard = cardInfo;
+            game.selectedCard = cardInfo;
             ClipData data = ClipData.newPlainText("", "");
 
             // Get the touch point in screen coords
@@ -88,8 +92,8 @@ public class PlayingCardView extends LinearLayout implements View.OnClickListene
     @Override
     public boolean onDrag(View v, DragEvent event){
         if(event.getAction() == DragEvent.ACTION_DROP){
-            mainActivity.destinationCard = cardInfo;
-            mainActivity.update();
+            game.destinationCard = cardInfo;
+            game.update();
         }
         return true;
     }
