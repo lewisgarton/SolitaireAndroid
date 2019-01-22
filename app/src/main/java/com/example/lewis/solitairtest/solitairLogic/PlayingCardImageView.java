@@ -36,7 +36,7 @@ public class PlayingCardImageView extends android.support.v7.widget.AppCompatIma
 
         // Don't set a margin if the card is a top card
         if(isTopCard) lp.setMargins(0, 0, 0, 0);
-        else lp.setMargins(0, 0, 0, -(int)(GameFragment.deviceHeight*0.15*0.9));
+        else lp.setMargins(0, 0, 0, -(int)(GameFragment.deviceHeight*0.15*0.75));
 
         setLayoutParams(lp);
     }

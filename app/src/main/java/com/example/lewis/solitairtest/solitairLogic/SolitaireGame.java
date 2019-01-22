@@ -37,7 +37,7 @@ public class SolitaireGame {
     public void resetBoard() {
         // Setup the decks
         stock = new Deck(Deck.DeckType.STANDARD_NO_JOKERS);
-        //stock.shuffle();
+        stock.shuffle();
         wastePile = new Deck();
 
         //setup the Foundations
@@ -132,6 +132,17 @@ public class SolitaireGame {
      */
     public void log(String id, String msg){
         //MainActivity.log(id, msg);
+    }
+
+    public boolean isComplete(){
+        boolean result = false;
+
+        for(Foundation f : foundations) {
+            if (f.size() ==  13) result = true;
+        }
+
+        return result;
+
     }
 
     /**

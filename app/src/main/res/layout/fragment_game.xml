@@ -33,7 +33,7 @@
             app:layout_constraintWidth_percent="0.30">
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/btn_menu"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/menu"

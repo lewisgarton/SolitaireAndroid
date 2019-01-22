@@ -2,8 +2,10 @@ package com.example.lewis.solitairtest;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +29,11 @@ public class GameFragment extends Fragment {
     public View v;
     private DisplayMetrics displayMetrics = new DisplayMetrics();
     public static int deviceHeight = 0;
+    private Button btnMenu;
+    public Bundle savedInstanceState;
+    public boolean newGame = false;
+
+
 
     @Override
     public Context getContext() {
@@ -39,22 +46,39 @@ public class GameFragment extends Fragment {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_game, container, false);
         game = new SolitaireGame();
-        game.resetBoard();
+        this.savedInstanceState = savedInstanceState;
         ((MainActivity)getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         deviceHeight = displayMetrics.heightPixels;
-        //if(savedInstanceState != null){
-            //GameState gState = new GameState(game);
-            //gState.restoreSave(savedInstanceState.getString("SAVE"));
-        //} else {
-        //    game.resetBoard();
-        //}
+        if(savedInstanceState != null && !newGame){
+            GameState gState = new GameState(game);
+            gState.restoreSave(savedInstanceState.getString("SAVE"));
+        } else {
+           game.resetBoard();
+        }
+        newGame = false;
 
         //stateChanged = true;
         //selectedCard = null;
         //destinationCard = null;
         getLayouts();
         update();
+        btnMenu = (Button) v.findViewById(R.id.btn_menu);
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getContext()).setViewPager(0);
+            }
+        });
+
         return v;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        //Save the fragment's state here
+        GameState gameState = new GameState(game);
+        savedInstanceState.putString("SAVE", gameState.createSave());
     }
 
 
@@ -85,7 +109,7 @@ public class GameFragment extends Fragment {
      * another card, update then calls drawTableus and drawfoundationFrames as necessary.     *
      */
     public void update() {
-
+        if(newGame) game.resetBoard();
         if (selectedCard != null && destinationCard == null) {
             game.cardClicked(selectedCard);
             selectedCard = null;
@@ -94,10 +118,33 @@ public class GameFragment extends Fragment {
             selectedCard = null;
             destinationCard = null;
         }
+
+        if(game.isComplete()){
+            gameOver();
+            ((MainActivity)getContext()).gameInProgress = false;
+            game.resetBoard();
+            ((MainActivity)getContext()).setViewPager(0);
+
+
+        }
+
         clear();
         drawDeck();
         drawTableus();
         drawfoundationFrames();
+    }
+
+    public void gameOver(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(getString(R.string.alert_win_title));
+        builder.setMessage(getString(R.string.alert_win_message));
+        builder.setCancelable(true);
+        builder.setNeutralButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        builder.show();
     }
 
     public void drawDeck() {

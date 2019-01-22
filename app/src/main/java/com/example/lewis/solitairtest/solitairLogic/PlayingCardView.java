@@ -52,7 +52,7 @@ public class PlayingCardView extends LinearLayout implements View.OnClickListene
     public void onClick(View v) {
         game.selectedCard = cardInfo;
         game.update();
-        Toast.makeText(getContext(), "" + this.cardInfo.cardId, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(), "" + this.cardInfo.cardId, Toast.LENGTH_SHORT).show();
     }
 
     /**

@@ -28,4 +28,9 @@ public class ScreensPagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return fragmentList.size();
     }
+
+    public void setFragment(int i, Fragment fragment){
+        fragmentList.remove(i);
+        fragmentList.add(i, fragment);
+    }
 }
